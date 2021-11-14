@@ -31,7 +31,8 @@ public:
     QSqlQueryModel* afficher();
     bool supprimer(int);
     bool modifier(int,int,int,QString,QString,QString,QString );
-
+    QSqlQueryModel*  chercherclients(int,QString);
+    QSqlQueryModel* trierclients();
 private:
 int CIN , AGE , NUM ;
 QString  NOM , PRENOM , EMAIL, ADRESSE;

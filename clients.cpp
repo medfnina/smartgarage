@@ -88,3 +88,40 @@ bool clients::modifier(int cin,int age,int num,QString nom,QString prenom,QStrin
     return query.exec();
 }
 
+QSqlQueryModel * clients::chercherclients(int cin,QString nom)
+{
+    QSqlQueryModel * model=new QSqlQueryModel();
+    QSqlQuery query;
+    query.prepare("SELECT * from clients where cin like :cin or nom like :nom ");
+    query.bindValue(":cin",CIN);// CIN VARIABLE LOCAL BA3D BCH NA3MALOU APPEL BIL getIDANIM()
+    query.bindValue(":nom",NOM);
+    query.exec();
+    model->setQuery(query);
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("cin"));
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("nom"));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("prenom"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("age"));
+    model->setHeaderData(4, Qt::Horizontal, QObject::tr("adresse"));
+    model->setHeaderData(5, Qt::Horizontal, QObject::tr("email"));
+    model->setHeaderData(6, Qt::Horizontal, QObject::tr("num"));
+
+    return model;
+}
+
+QSqlQueryModel* clients::trierclients()
+{
+    QSqlQueryModel* model = new QSqlQueryModel();
+
+        model->setQuery("select *FROM clients ORDER BY cin ASC");
+
+
+        model->setHeaderData(0, Qt::Horizontal, QObject::tr("cin"));
+        model->setHeaderData(1, Qt::Horizontal, QObject::tr("nom"));
+        model->setHeaderData(2, Qt::Horizontal, QObject::tr("prenom"));
+        model->setHeaderData(3, Qt::Horizontal, QObject::tr("age"));
+        model->setHeaderData(4, Qt::Horizontal, QObject::tr("adresse"));
+        model->setHeaderData(5, Qt::Horizontal, QObject::tr("email"));
+        model->setHeaderData(6, Qt::Horizontal, QObject::tr("num"));
+
+    return model;
+}

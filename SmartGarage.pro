@@ -1,5 +1,10 @@
 QT       += core gui
 QT+=sql
+QT += network
+QT       += core gui sql network multimedia multimediawidgets charts
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,16 +24,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     clients.cpp \
     connection.cpp \
+    exportexcelobject.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    smtp.cpp \
+    stat_combo.cpp
 
 HEADERS += \
     clients.h \
     connection.h \
-    mainwindow.h
+    exportexcelobject.h \
+    mainwindow.h \
+    smtp.h \
+    stat_combo.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    stat_combo.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

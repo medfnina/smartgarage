@@ -56,6 +56,20 @@ private slots:
 
     void on_rechercher_clicked();
 
+    void on_loadde_clicked();
+
+    void on_supprimer1_cursorPositionChanged(int arg1, int arg2);
+
+    void on_loadUP_clicked();
+
+    void on_comboBox_activated(const QString &arg1);
+
+    void on_refresh_clicked();
+
+    void on_browseBtn_clicked();
+
+    void on_file_cursorPositionChanged(int arg1, int arg2);
+
 private:
     Ui::MainWindow *ui;
     clients C;

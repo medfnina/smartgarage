@@ -9,7 +9,8 @@
 #include <QStandardItemModel>
 #include <QDialog>
 #include <QFileDialog>
-
+#include <QComboBox>
+#include <QSqlQuery>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->cin->setValidator(new QIntValidator(0, 999999999, this));
     ui->tabclients->setModel(C.afficher());
+
 
     //for email tab
     connect(ui->sendBtn, SIGNAL(clicked()),this, SLOT(sendMail()));
@@ -57,6 +59,13 @@ void MainWindow::on_ajouter_clicked()
                    QMessageBox::critical(nullptr, QObject::tr("database is not open"),
                                QObject::tr("erreur.\n"
                                            "Click Cancel to exit."), QMessageBox::Cancel);
+    ui->cin->clear();
+    ui->nom->clear();
+    ui->prenom->clear();
+    ui->age->clear();
+    ui->adresse->clear();
+    ui->email->clear();
+    ui->num->clear();
 }
 
 
@@ -69,7 +78,7 @@ void MainWindow::on_ajouter_clicked()
 void MainWindow::on_supprimer_clicked()
 {
     clients C;
-    C.setCIN(ui->supprimer1->text().toInt());
+    C.setCIN(ui->comboBox_2->currentText().toInt());
     bool test=C.supprimer(C.getCIN());
     if (test)
 
@@ -87,6 +96,7 @@ void MainWindow::on_supprimer_clicked()
                    QMessageBox::critical(nullptr, QObject::tr("database is not open"),
                                QObject::tr("erreur.\n"
                                            "Click Cancel to exit."), QMessageBox::Cancel);
+    ui->comboBox_2->clear();
 }
 
 void MainWindow::on_modifier_clicked()
@@ -185,12 +195,51 @@ void MainWindow::on_export_excel_clicked()
 //stat
 void MainWindow::on_stat_clicked()
 {
-    s = new stat_combo();
-
-  s->setWindowTitle("statistique ComboBox");
-  s->choix_pie();
-  s->show();
-
+    //ui->stackedWidget_2->setCurrentIndex(1);
+    QSqlQueryModel * model= new QSqlQueryModel();
+    model->setQuery("select * from clients where age < 20 ");
+    float age=model->rowCount();
+    model->setQuery("select * from clients where age  between 20 and 25 ");
+    float agee=model->rowCount();
+    model->setQuery("select * from clients where age >25 ");
+    float ageee=model->rowCount();
+    float total=age+agee+ageee;
+    QString a=QString("moins de 20 ans . "+QString::number((age*100)/total,'f',2)+"%" );
+    QString b=QString("entre 20 et 25 ans .  "+QString::number((agee*100)/total,'f',2)+"%" );
+    QString c=QString("plus de 25 ans ."+QString::number((ageee*100)/total,'f',2)+"%" );
+    QPieSeries *series = new QPieSeries();
+    series->append(a,age);
+    series->append(b,agee);
+    series->append(c,ageee);
+    if (age!=0)
+    {QPieSlice *slice = series->slices().at(0);
+        slice->setLabelVisible();
+        slice->setPen(QPen());}
+    if ( agee!=0)
+    {
+        // Add label, explode and define brush for 2nd slice
+        QPieSlice *slice1 = series->slices().at(1);
+        //slice1->setExploded();
+        slice1->setLabelVisible();
+    }
+    if(ageee!=0)
+    {
+        // Add labels to rest of slices
+        QPieSlice *slice2 = series->slices().at(2);
+        //slice1->setExploded();
+        slice2->setLabelVisible();
+    }
+    // Create the chart widget
+    QChart *chart = new QChart();
+    // Add data to chart with title and hide legend
+    chart->addSeries(series);
+    chart->setTitle("Clients Par age :Nombre Des Clients "+ QString::number(total));
+    chart->legend()->hide();
+    // Used to display the chart
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->resize(200,25);
+    chartView->show();
 }
 
 
@@ -198,7 +247,7 @@ void MainWindow::on_stat_clicked()
 
 
 
-
+//Recherche
 void MainWindow::on_pushButton_7_clicked()
 {
     clients C1;
@@ -215,7 +264,7 @@ void MainWindow::on_pushButton_7_clicked()
           ui->email->clear();
           ui->num->clear();
 }
-
+// TRIER
 void MainWindow::on_pushButton_10_clicked()
 {
     ui->tabclients->setModel(C.trierclients());
@@ -247,3 +296,61 @@ void MainWindow::on_pushButton_10_clicked()
               ui->email->clear();
               ui->num->clear();
 }
+
+void MainWindow::on_loadde_clicked()
+{
+    QSqlQueryModel *model= new QSqlQueryModel();
+    QSqlQuery   *q= new QSqlQuery();
+    q->prepare("SELECT cin from clients");
+    q->exec();
+    model->setQuery(*q); ///
+    ui->comboBox_2->setModel(model);
+}
+
+
+
+void MainWindow::on_loadUP_clicked()
+{
+
+
+
+             QSqlQueryModel *model= new QSqlQueryModel();
+             QSqlQuery   *q= new QSqlQuery();
+             q->prepare("SELECT cin from clients");
+             q->exec();
+             model->setQuery(*q);
+
+             ui->comboBox->setModel(model);
+
+
+
+
+}
+
+
+void MainWindow::on_comboBox_activated(const QString &arg1)
+{
+    QString cin=arg1;
+         QSqlQueryModel *model= new QSqlQueryModel();
+             QSqlQuery   *query= new QSqlQuery();
+              query->prepare("SELECT * from clients where cin='"+cin+"'");
+              if(query->exec())
+              {
+                  while (query->next())
+                  {
+
+                      ui->cin->setText(query->value(0).toString());
+                      ui->nom->setText(query->value(1).toString());
+                      ui->prenom->setText(query->value(2).toString());
+                      ui->age->setText(query->value(3).toString());
+                      ui->adresse->setText(query->value(4).toString());
+                      ui->email->setText(query->value(5).toString());
+                      ui->num->setText(query->value(6).toString());
+}}
+              model->setQuery(*query);}
+
+void MainWindow::on_refresh_clicked()
+{
+    ui->tabclients->setModel(C.afficher());
+}
+

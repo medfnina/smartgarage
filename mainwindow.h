@@ -5,6 +5,7 @@
 #include "clients.h"
 #include "exportexcelobject.h"
 #include "stat_combo.h"
+#include "arduino.h"
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
 #include <QTextTableFormat>
@@ -29,6 +30,9 @@ public:
     ~MainWindow();
 
 private slots:
+    void update_label();   // slot permettant la mise à jour du label état de la lampe 1,
+    // ce slot est lancé à chaque réception d'un message de Arduino
+
 
     void on_ajouter_clicked();
 
@@ -70,10 +74,14 @@ private slots:
 
     void on_file_cursorPositionChanged(int arg1, int arg2);
 
+    void on_ouvrir_clicked();
+
 private:
     Ui::MainWindow *ui;
     clients C;
     QStringList files;
     stat_combo *s;
+    Arduino A; // objet temporaire
+    QByteArray data; // variable contenant les données reçues
 };
 #endif // MAINWINDOW_H

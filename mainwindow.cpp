@@ -17,6 +17,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    int ret=A.connect_arduino(); // lancer la connexion à arduino
+    switch(ret){
+    case(0):qDebug()<< "arduino is available and connected to : "<< A.getarduino_port_name();
+        break;
+    case(1):qDebug() << "arduino is available but not connected to :" <<A.getarduino_port_name();
+       break;
+    case(-1):qDebug() << "arduino is not available";
+    }
+     QObject::connect(A.getserial(),SIGNAL(readyRead()),this,SLOT(update_label())); // permet de lancer
+     //le slot update_label suite à la reception du signal readyRead (reception des données).
     ui->cin->setValidator(new QIntValidator(0, 999999999, this));
     ui->tabclients->setModel(C.afficher());
 
@@ -353,4 +363,21 @@ void MainWindow::on_refresh_clicked()
 {
     ui->tabclients->setModel(C.afficher());
 }
+void MainWindow::update_label()
+{
+    data=A.read_from_arduino();
 
+    if(data=="1")
+
+        //Remember from Arduino Serial.println(a);
+                   QMessageBox::information(this, tr("Correct Code!"), "ACESS GIVEN");
+
+    else if (data=="0")
+
+        QMessageBox::information(this, tr(" Incorrect Code"), "ACCESS DENIED");
+}
+
+void MainWindow::on_ouvrir_clicked()
+{
+     A.write_to_arduino("3");  //envoyer 0 à arduino
+}
